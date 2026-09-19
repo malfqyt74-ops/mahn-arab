@@ -3,47 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مهن عرب</title>
-    <!-- أيقونة المتصفح المحدثة لتعمل بشكل صحيح على GitHub Pages -->
-    <link rel="icon" href="/mahn-arab/logo.svg" type="image/svg+xml">
     
-    <!-- باقي التنسيقات والمكتبات الخاصة بك -->
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- محتوى الموقع والأكواد البرمجية الكاملة -->
-    <div id="app"></div>
-
-    <script type="module">
-        // استيراد أو تهيئة فايربيز والخدمات الخاصة بك هنا
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // أكواد النظام ورفع الإعلانات الخاصة بك
-        document.getElementById('btnSubmitAd')?.addEventListener('click', async () => {
-            const formData = new FormData();
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput && fileInput.files[0]) {
-                formData.append("image", fileInput.files[0]);
-            }
-            
-            try {
-                // رفع الصور أو بيانات الإعلان
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                const result = await res.json();
-                let attachmentUrl = "";
-                if (result && result.success) {
-                    attachmentUrl = result.data.url;
-                }
-            } catch (e) {
-                console.error("فشل رفع الملف", e);
-            }
-        });
-    </script>
-</body>
-</html>
+    <title>مهن عرب | Mehan Arab - منصة الوظائف والإعلانات الأولى</title>
+    <meta name="description" content="منصة مهن عرب مقدمة من استوديو هيوبوس يمني وركس لعرض ونشر الإعلانات والفرص الوظيفية والخدمات بضغطات سريعة.">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; }
+        
+        body { 
             background: #0b1120; 
             color: #e2e8f0; 
             min-height: 100vh; 
@@ -325,7 +292,6 @@
         body.light-mode .info-box h4 { color: #0f172a; }
         .info-box ul { padding-right: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 
-        /* قسم التعليقات داخل تفاصيل الإعلان */
         .comments-section { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; background: #030712; padding: 20px; border-radius: 12px; border: 1px solid #1f2937; }
         body.light-mode .comments-section { background: #f8fafc; border: 1px solid #e2e8f0; }
         .comment-item { display: flex; gap: 12px; background: #111827; padding: 12px; border-radius: 10px; border: 1px solid #1f2937; }
@@ -629,757 +595,744 @@
             <button class="btn btn-outline" onclick="document.getElementById('fileUploadInput').click()">اختر صورة للقص والمعاينة</button>
 
             <div class="crop-container" id="cropContainer">
-                <span style="font-size:0.9rem; color:#9ca3af;">اسحب الصورة لتحديد الجزء المطلوب:</span>
                 <div class="crop-canvas-box">
                     <canvas id="imageCanvas" width="160" height="160"></canvas>
                 </div>
-                <div style="display:flex; gap:10px; width:100%;">
-                    <input type="range" id="zoomRange" min="0.5" max="3" step="0.1" value="1" style="flex:1;">
-                    <button class="btn" style="padding: 6px 12px;" onclick="applyCrop()">اعتماد الصورة</button>
-                </div>
+                <span style="font-size: 0.85rem; color: #9ca3af;">اسحب الصورة لتعديل الموضع ثم اضغط اعتماد</span>
+                <button class="btn" id="btnConfirmCrop">اعتماد الصورة الشخصية</button>
             </div>
 
-            <label style="font-size:0.95rem; color:#9ca3af;">رابط الصورة الشخصية:</label>
-            <input type="text" id="editUserAvatar" placeholder="رابط الصورة">
-
-            <button class="btn" id="btnSaveProfile">حفظ التعديلات</button>
-
-            <label style="font-size:1.1rem; color:#f9fafb; margin-top: 10px;">إعلاناتك المنشورة:</label>
+            <h4 style="color:#f9fafb; margin-top:10px;">إعلاناتك النشطة:</h4>
             <div class="my-ads-section" id="myAdsContainer">
-                <div style="text-align:center; color:#9ca3af; padding: 15px;">جاري التحميل...</div>
+                <div class="empty" style="padding:15px;">لا توجد إعلانات منشورة بعد.</div>
             </div>
 
-            <button class="btn btn-danger" id="btnLogout" style="margin-top: 10px;">تسجيل الخروج</button>
-            <button class="btn btn-outline" onclick="closePage('profilePage')">العودة للرئيسية</button>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn btn-success" id="btnSaveProfile" style="flex:1;">حفظ التغييرات</button>
+                <button class="btn btn-danger" id="btnLogout" style="flex:1;">تسجيل الخروج</button>
+            </div>
+            <button class="btn btn-outline" style="margin-top:10px;" onclick="closePage('profilePage')">إغلاق</button>
         </div>
     </div>
 
     <footer>
-        جميع الحقوق محفوظة &copy; مهن عرب | مقدم من <span>استوديو هيوبوس يمني وركس (Hyobos Yemeni Works)</span>
+        جميع الحقوق محفوظة © 2026 <span>مهن عرب</span> | مقدم من <span>استوديو هيوبوس يمني وركس</span>
     </footer>
 
     <script>
-        const arabCountries = {
-            "YE": { name: "اليمن", cities: ["تعز", "صنعاء", "عدن", "حضرموت", "إب", "الحديدة", "المكلا", "ذمار", "سيئون", "البيضاء"] },
-            "SA": { name: "السعودية", cities: ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر", "الطائف", "تبوك", "القصيم", "أبها"] },
-            "AE": { name: "الإمارات", cities: ["دبي", "أبوظبي", "الشارقة", "عجمان", "راس الخيمة", "الفجيرة", "العين"] },
-            "EG": { name: "مصر", cities: ["القاهرة", "الإسكندرية", "الجيزة", "المحلة الكبرى", "أسوان", "الإسماعيلية", "السويس", "بورسعيد", "الأقصر", "المنصورة"] },
-            "IQ": { name: "العراق", cities: ["بغداد", "البصرة", "أربيل", "الموصل", "النجف", "كربلاء", "السليمانية", "الكركوك"] },
-            "JO": { name: "الأردن", cities: ["عمان", "إربد", "الزرقاء", "العقبة", "السلط", "مادبا", "الكرك"] },
-            "KW": { name: "الكويت", cities: ["مدينة الكويت", "حولي", "السالمية", "الفروانية", "الجهراء", "الأحمدي"] },
-            "QA": { name: "قطر", cities: ["الدوحة", "الوكرة", "الخور", "الريان", "لوسيل", "أم صلال"] },
-            "OM": { name: "عمان", cities: ["مسقط", "صلالة", "نزوى", "صُحر", "بركاء", "صور"] },
-            "BH": { name: "البحرين", cities: ["المنامة", "المحرق", "الرفاع", "المدينة الشمالية", "عالي", "سترى"] },
-            "LB": { name: "لبنان", cities: ["بيروت", "طرابلس", "صيدا", "جونية", "زحلة", "بعلبك"] },
-            "SY": { name: "سوريا", cities: ["دمشق", "حلب", "حمص", "اللاذقية", "حماة", "دير الزور", "ططوس"] },
-            "SD": { name: "السودان", cities: ["الخرطوم", "أم درمان", "بورتسودان", "كسلا", "نيالا", "الأبيض"] },
-            "DZ": { name: "الجزائر", cities: ["الجزائر العاصمة", "وهران", "قسنطينة", "عنابة", "باتنة", "بليدة"] },
-            "MA": { name: "المغرب", cities: ["الدار البيضاء", "الرباط", "فاس", "مراكش", "طنجة", "أغادير", "مكناس"] },
-            "TN": { name: "تونس", cities: ["تونس العاصمة", "صفاقس", "سوسة", "قابس", "بنزرت", "القيروان"] },
-            "LY": { name: "ليبيا", cities: ["طرابلس", "بنغازي", "مصراتة", "الزاوية", "سبها", "البيضاء"] },
-            "PS": { name: "فلسطين", cities: ["القدس", "غزة", "رام الله", "خانيونس", "نابلس", "الخليل", "بيت لحم"] },
-            "PS_SOMALIA": { name: "الصومال", cities: ["مقديشو", "هرجيسا", "بوصاصو", "كيسمايو", "بربرة"] },
-            "DJ": { name: "جيبوتي", cities: ["مدينة جيبوتي", "علي صبيح", "تاجوراء", "أوبوك"] },
-            "MR": { name: "موريتانيا", cities: ["نواكشوط", "نواذيبو", "روصو", "الزويرات", "كيهيدي"] },
-            "KM": { name: "جزر القمر", cities: ["موروني", "موتسامودو", "فومبوني"] }
+        // بيانات الدول والمدن العربية
+        const countriesData = {
+            "YE": { name: "اليمن", cities: ["تعز", "صنعاء", "عدن", "إب", "المكلا", "الحديدة"] },
+            "SA": { name: "المملكة العربية السعودية", cities: ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر"] },
+            "EG": { name: "جمهورية مصر العربية", cities: ["القاهرة", "الإسكندرية", "الجيزة", "المنصورة", "أسوان"] },
+            "AE": { name: "الإمارات العربية المتحدة", cities: ["دبي", "أبوظبي", "الشارقة", "عجمان"] },
+            "JO": { name: "المملكة الأردنية الهاشمية", cities: ["عمان", "إربد", "الزرقاء", "العقبة"] },
+            "KW": { name: "دولة الكويت", cities: ["الكويت العاصمة", "حولي", "السالمية", "الفروانية"] }
         };
 
-        const filterCountry = document.getElementById('filterCountry');
-        const countrySelect = document.getElementById('countrySelect');
+        // الحالة العامة للتطبيق
+        let currentUser = JSON.parse(localStorage.getItem('mehan_current_user')) || null;
+        let adsList = JSON.parse(localStorage.getItem('mehan_ads_list')) || [
+            {
+                id: "ad_1",
+                userId: "user_heobos",
+                userName: "محمد هيوبوس",
+                userAvatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+                isVerified: true,
+                title: "مطور واجهات وتطبيقات ويب باستخدام Next.js و React",
+                category: "tech",
+                country: "YE",
+                city: "تعز",
+                phone: "+967700000000",
+                description: "مطور برمجيات ذو خبرة في بناء المواقع والتطبيقات السريعة والمتجاوبة باستخدام أحدث التقنيات الحديثة مثل Next.js و Tailwind CSS و TypeScript.",
+                attachment: "",
+                goal: "job_seeker",
+                date: "2026-09-18",
+                likes: 12,
+                dislikes: 0,
+                likesUsers: [],
+                dislikesUsers: [],
+                comments: []
+            }
+        ];
+        let conversations = JSON.parse(localStorage.getItem('mehan_conversations')) || [];
+        
+        let newAdData = { country: "", city: "", goal: "", title: "", category: "", phone: "", description: "", attachment: "" };
+        let activeFilterCountry = "";
+        let activeFilterCity = "";
+        let activeFilterCategory = "";
+        let activeSearchQuery = "";
 
-        Object.keys(arabCountries).forEach(code => {
-            const opt = `<option value="${code}">${arabCountries[code].name}</option>`;
-            filterCountry.innerHTML += opt;
-            countrySelect.innerHTML += opt;
+        // متغيرات لقص الصور
+        let cropImageObj = null;
+        let cropOffsetX = 0;
+        let cropOffsetY = 0;
+        let isDragging = false;
+        let startX = 0, startY = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initCountriesAndFilters();
+            renderAds();
+            updateAuthUI();
+
+            // ربط أحداث الأزرار الرئيسية
+            document.getElementById("loginBtn").addEventListener("click", simulateGoogleLogin);
+            document.getElementById("userBox").addEventListener("click", () => openPage('profilePage'));
+            document.getElementById("btnPostAd").addEventListener("click", () => {
+                if (!currentUser) {
+                    alert("الرجاء تسجيل الدخول أولاً لنشر إعلان.");
+                    simulateGoogleLogin();
+                    return;
+                }
+                openPage('adPage');
+                nextStep(1);
+            });
+            document.getElementById("btnSearch").addEventListener("click", applySearchAndFilter);
+            document.getElementById("searchInput").addEventListener("keyup", (e) => {
+                if (e.key === 'Enter') applySearchAndFilter();
+            });
+            document.getElementById("filterCountry").addEventListener("change", (e) => {
+                updateCityFilterDropdown(e.target.value);
+                applySearchAndFilter();
+            });
+            document.getElementById("filterCity").addEventListener("change", applySearchAndFilter);
+            document.getElementById("filterCategory").addEventListener("change", applySearchAndFilter);
+            document.getElementById("countrySelect").addEventListener("change", (e) => updateAdCityDropdown(e.target.value));
+            document.getElementById("fileUploadInput").addEventListener("change", handleImageUploadForCrop);
+            document.getElementById("btnConfirmCrop").addEventListener("click", confirmCropImage);
+            document.getElementById("btnSaveProfile").addEventListener("click", saveProfileChanges);
+            document.getElementById("btnLogout").addEventListener("click", logoutUser);
+            document.getElementById("adAttachmentInput").addEventListener("change", handleAdAttachmentUpload);
+            document.getElementById("btnSubmitAd").addEventListener("click", submitNewAd);
+            document.getElementById("btnSendChatMessage").addEventListener("click", sendChatMessage);
+
+            // إعداد تفاعلات السحب على كانفاس القص
+            setupCanvasDrag();
         });
-
-        const loadCities = (code, elem) => {
-            elem.innerHTML = '<option value="">جميع المدن...</option>';
-            if (code && arabCountries[code]) {
-                arabCountries[code].cities.forEach(c => elem.innerHTML += `<option value="${c}">${c}</option>`);
-                elem.disabled = false;
-            } else elem.disabled = true;
-        };
-
-        filterCountry.addEventListener('change', (e) => loadCities(e.target.value, document.getElementById('filterCity')));
-        countrySelect.addEventListener('change', (e) => loadCities(e.target.value, document.getElementById('citySelect')));
 
         function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('themeToggleBtn');
-            body.classList.toggle('light-mode');
-            if (body.classList.contains('light-mode')) {
-                btn.innerText = "الوضع الداكن";
+            document.body.classList.toggle("light-mode");
+            const isLight = document.body.classList.contains("light-mode");
+            document.getElementById("themeToggleBtn").innerText = isLight ? "الوضع الداكن" : "الوضع الفاتح";
+        }
+
+        function openPage(pageId) {
+            document.getElementById(pageId).style.display = "flex";
+            if (pageId === 'profilePage' && currentUser) {
+                document.getElementById('editUserName').value = currentUser.name;
+                document.getElementById('editProfilePreview').src = currentUser.avatar;
+            }
+            if (pageId === 'conversationsPage') {
+                renderConversationsList();
+            }
+        }
+
+        function closePage(pageId) {
+            document.getElementById(pageId).style.display = "none";
+        }
+
+        function simulateGoogleLogin() {
+            const name = prompt("أدخل اسمك الكريم لتسجيل الدخول عبر جوجل:", "محمد بن عبد المجيد");
+            if (!name) return;
+            currentUser = {
+                id: "user_" + Date.now(),
+                name: name,
+                avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+                isVerified: true
+            };
+            localStorage.setItem('mehan_current_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            alert("تم تسجيل الدخول بنجاح!");
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem('mehan_current_user');
+            updateAuthUI();
+            closePage('profilePage');
+            renderAds();
+        }
+
+        function updateAuthUI() {
+            const loginBtn = document.getElementById("loginBtn");
+            const userBox = document.getElementById("userBox");
+            if (currentUser) {
+                loginBtn.style.display = "none";
+                userBox.style.display = "flex";
+                document.getElementById("userName").innerText = currentUser.name;
+                document.getElementById("userAvatar").src = currentUser.avatar;
             } else {
-                btn.innerText = "الوضع الفاتح";
+                loginBtn.style.display = "inline-flex";
+                userBox.style.display = "none";
             }
         }
 
-        function closeAllPages() {
-            document.querySelectorAll('.page-overlay').forEach(p => p.style.display = 'none');
-        }
-
-        function openPage(id) {
-            closeAllPages();
-            document.getElementById(id).style.display = 'block';
-        }
-
-        function closePage(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-        
-        function nextStep(s) {
-            if (s === 2 && !document.getElementById('citySelect').value) {
-                alert("اختر الدولة والمدينة أولاً!"); return;
-            }
-            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step' + s).classList.add('active');
-        }
-
-        let selectedGoal = '';
-        function selectGoal(g) { selectedGoal = g; nextStep(3); }
-    </script>
-
-    <!-- Firebase Script Engine & Real Messaging System -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-      import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, setDoc, query, orderBy, onSnapshot, serverTimestamp, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyALhLYJkkivFC48zRLMfhfGkx_Jl8fl8Bo",
-        authDomain: "hyobos-yemeni-works.firebaseapp.com",
-        projectId: "hyobos-yemeni-works",
-        storageBucket: "hyobos-yemeni-works.firebasestorage.app",
-        messagingSenderId: "390320294412",
-        appId: "1:390320294412:web:f7d2d58e7ddefdfd5f3c29"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-
-      const IMGBB_API_KEY = "6d207e02198a847ea5ad94a2fe40c216";
-
-      let currentUser = null, allAds = [], currentOpenedAdId = null, currentActiveChatId = null, unsubscribeMessages = null, unsubscribeComments = null;
-
-      const canvas = document.getElementById('imageCanvas');
-      const ctx = canvas.getContext('2d');
-      let uploadedImage = new Image();
-      let imgX = 0, imgY = 0, imgScale = 1;
-      let isDragging = false, startX, startY;
-
-      const likeSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>`;
-      const dislikeSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>`;
-      const shareSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`;
-
-      const loginBtn = document.getElementById('loginBtn');
-      const userBox = document.getElementById('userBox');
-
-      loginBtn.addEventListener('click', async () => {
-        try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }
-      });
-
-      document.getElementById('btnLogout').addEventListener('click', () => {
-        signOut(auth);
-        closePage('profilePage');
-      });
-
-      userBox.addEventListener('click', async () => {
-        if (!currentUser) return;
-        document.getElementById('editUserName').value = currentUser.displayName || '';
-        document.getElementById('editUserAvatar').value = currentUser.photoURL || '';
-        document.getElementById('editProfilePreview').src = currentUser.photoURL || 'https://via.placeholder.com/100';
-        document.getElementById('cropContainer').style.display = 'none';
-
-        renderMyAds();
-        openPage('profilePage');
-      });
-
-      function renderMyAds() {
-        const container = document.getElementById('myAdsContainer');
-        const userAds = allAds.filter(a => a.userId === currentUser.uid);
-
-        if (userAds.length === 0) {
-          container.innerHTML = `<div style="text-align:center; color:#9ca3af; padding: 15px;">ليس لديك إعلانات منشورة.</div>`;
-          return;
-        }
-
-        let html = '';
-        userAds.forEach(a => {
-          html += `
-            <div class="my-ad-item">
-              <span class="my-ad-title" title="${a.title}">${a.title}</span>
-              <button class="btn btn-danger" style="padding: 6px 12px;" onclick="deleteMyAd('${a.id}')">حذف</button>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
-      }
-
-      window.deleteMyAd = async (adId) => {
-        if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الإعلان؟")) return;
-        try {
-          await deleteDoc(doc(db, "ads", adId));
-          renderMyAds();
-        } catch (e) {
-          alert("خطأ أثناء الحذف: " + e.message);
-        }
-      };
-
-      document.getElementById('fileUploadInput').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          uploadedImage.onload = () => {
-            imgScale = Math.max(canvas.width / uploadedImage.width, canvas.height / uploadedImage.height);
-            imgX = (canvas.width - uploadedImage.width * imgScale) / 2;
-            imgY = (canvas.height - uploadedImage.height * imgScale) / 2;
-            document.getElementById('zoomRange').value = imgScale;
-            drawCanvas();
-            document.getElementById('cropContainer').style.display = 'flex';
-          };
-          uploadedImage.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-
-      function drawCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(uploadedImage, imgX, imgY, uploadedImage.width * imgScale, uploadedImage.height * imgScale);
-      }
-
-      canvas.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - imgX; startY = e.clientY - imgY; });
-      window.addEventListener('mouseup', () => { isDragging = false; });
-      canvas.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        imgX = e.clientX - startX;
-        imgY = e.clientY - startY;
-        drawCanvas();
-      });
-
-      document.getElementById('zoomRange').addEventListener('input', (e) => {
-        imgScale = parseFloat(e.target.value);
-        drawCanvas();
-      });
-
-      window.applyCrop = async () => {
-        const croppedDataUrl = canvas.toDataURL('image/png');
-        document.getElementById('editProfilePreview').src = croppedDataUrl;
-        document.getElementById('cropContainer').style.display = 'none';
-
-        const blob = await (await fetch(croppedDataUrl)).blob();
-        const file = new File([blob], "profile.png", { type: "image/png" });
-
-        const formData = new FormData();
-        formData.append("image", file);
-
-        try {
-          const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-          const result = await res.json();
-          if (result && result.success) {
-            document.getElementById('editUserAvatar').value = result.data.url;
-          }
-        } catch (err) { console.error(err); }
-      };
-
-      document.getElementById('btnSaveProfile').addEventListener('click', async () => {
-        if (!currentUser) return;
-        const newName = document.getElementById('editUserName').value.trim();
-        const newAvatar = document.getElementById('editUserAvatar').value.trim() || currentUser.photoURL;
-
-        try {
-          await updateProfile(currentUser, { displayName: newName, photoURL: newAvatar });
-          await setDoc(doc(db, "users", currentUser.uid), { displayName: newName, photoURL: newAvatar }, { merge: true });
-
-          const adsQuery = query(collection(db, "ads"), where("userId", "==", currentUser.uid));
-          const querySnapshot = await getDocs(adsQuery);
-          if (!querySnapshot.empty) {
-            const batch = writeBatch(db);
-            querySnapshot.forEach((docSnap) => {
-              batch.update(docSnap.ref, { userName: newName, userPhoto: newAvatar });
-            });
-            await batch.commit();
-          }
-
-          alert("تم حفظ التعديلات بنجاح!");
-          window.location.reload();
-        } catch (e) { alert("حدث خطأ: " + e.message); }
-      });
-
-      onAuthStateChanged(auth, async (u) => {
-        currentUser = u;
-        if (u) {
-          loginBtn.style.display = 'none';
-          userBox.style.display = 'flex';
-          document.getElementById('userName').innerText = u.displayName || 'مستخدم';
-          document.getElementById('userAvatar').src = u.photoURL || 'https://via.placeholder.com/34';
-
-          await setDoc(doc(db, "users", u.uid), {
-            displayName: u.displayName,
-            photoURL: u.photoURL,
-            lastSeen: serverTimestamp(),
-            createdAt: serverTimestamp()
-          }, { merge: true });
-        } else {
-          loginBtn.style.display = 'inline-block';
-          userBox.style.display = 'none';
-        }
-        filterAds();
-        if (currentOpenedAdId) openAdPage(currentOpenedAdId);
-      });
-
-      const listenToAds = () => {
-        const q = query(collection(db, "ads"), orderBy("createdAt", "desc"));
-        onSnapshot(q, (snap) => {
-          allAds = [];
-          snap.forEach(docSnap => allAds.push({ id: docSnap.id, ...docSnap.data() }));
-          filterAds();
-          if (currentOpenedAdId) openAdPage(currentOpenedAdId);
-          if (currentUser && document.getElementById('profilePage').style.display === 'block') {
-            renderMyAds();
-          }
-        });
-      };
-
-      const renderAds = (ads) => {
-        const container = document.getElementById('adsListContainer');
-        if (!ads || ads.length === 0) {
-          container.innerHTML = `<div class="empty">لا توجد إعلانات مطابقة لبحثك.</div>`;
-          return;
-        }
-        
-        let html = '';
-        ads.forEach(a => {
-          const likedUsers = a.likedUsers || [];
-          const dislikedUsers = a.dislikedUsers || [];
-          const uid = currentUser ? currentUser.uid : null;
-          const isLiked = uid && likedUsers.includes(uid);
-          const isDisliked = uid && dislikedUsers.includes(uid);
-
-          html += `
-            <div class="ad-card" onclick="openAdPage('${a.id}')">
-              <div class="ad-top">
-                <div class="ad-head">
-                  <span class="ad-title">${a.title}</span>
-                  <span class="badge">${a.goal === 'job_seeker' ? 'باحث عن عمل' : 'طلب توظيف'}</span>
-                </div>
-                <div class="ad-meta">
-                  <span>الموقع: ${a.country} - ${a.city}</span>
-                  <span>التخصص: ${a.category}</span>
-                  <span>الناشر: <b class="publisher-link" onclick="event.stopPropagation(); viewPublisherProfile('${a.userId}', '${a.userName}', '${a.userPhoto}')">${a.userName}</b></span>
-                  ${a.phone ? `<span>الهاتف: ${a.phone}</span>` : ''}
-                </div>
-                <p class="ad-desc-preview">${a.description}</p>
-                ${a.attachmentUrl ? `<img src="${a.attachmentUrl}" class="ad-card-img" alt="مرفق الإعلان">` : ''}
-              </div>
-
-              <div class="ad-footer" onclick="event.stopPropagation()">
-                <div class="like-actions">
-                  <button class="action-btn ${isLiked ? 'active-like' : ''}" onclick="handleReaction('${a.id}', 'like')">
-                    ${likeSvg} <span>${likedUsers.length}</span>
-                  </button>
-                  <button class="action-btn ${isDisliked ? 'active-dislike' : ''}" onclick="handleReaction('${a.id}', 'dislike')">
-                    ${dislikeSvg} <span>${dislikedUsers.length}</span>
-                  </button>
-                </div>
-                <div style="display:flex; gap:10px;">
-                  <button class="action-btn" onclick="shareAd('${a.id}', '${a.title}')" title="مشاركة الإعلان">${shareSvg} مشاركة</button>
-                  <span style="font-size:0.9rem; color:#38bdf8; font-weight:600; align-self:center;">التفاصيل</span>
-                </div>
-              </div>
-            </div>`;
-        });
-        container.innerHTML = html;
-      };
-
-      window.shareAd = (adId, adTitle) => {
-        const shareUrl = window.location.href.split('#')[0] + '#' + adId;
-        if (navigator.share) {
-          navigator.share({ title: adTitle, text: 'شاهد هذا الإعلان على منصة مهن عرب:', url: shareUrl }).catch(() => {});
-        } else {
-          navigator.clipboard.writeText(shareUrl);
-          alert("تم نسخ رابط الإعلان إلى الحافظة بنجاح!");
-        }
-      };
-
-      window.handleReaction = async (adId, type) => {
-        if (!currentUser) { alert("يرجى التسجيل عبر جوجل أولاً للتفاعل!"); return; }
-        const adRef = doc(db, "ads", adId);
-        const targetAd = allAds.find(a => a.id === adId);
-        if (!targetAd) return;
-
-        let likedUsers = [...(targetAd.likedUsers || [])];
-        let dislikedUsers = [...(targetAd.dislikedUsers || [])];
-        const uid = currentUser.uid;
-
-        if (type === 'like') {
-          if (likedUsers.includes(uid)) likedUsers = likedUsers.filter(id => id !== uid);
-          else { likedUsers.push(uid); dislikedUsers = dislikedUsers.filter(id => id !== uid); }
-        } else if (type === 'dislike') {
-          if (dislikedUsers.includes(uid)) dislikedUsers = dislikedUsers.filter(id => id !== uid);
-          else { dislikedUsers.push(uid); likedUsers = likedUsers.filter(id => id !== uid); }
-        }
-
-        try { await updateDoc(adRef, { likedUsers, dislikedUsers }); } catch (e) { console.error(e); }
-      };
-
-      window.viewPublisherProfile = async (userId, name, photo) => {
-        document.getElementById('pubName').innerText = name || 'مستخدم';
-        document.getElementById('pubAvatar').src = photo || 'https://via.placeholder.com/100';
-        
-        const msgBtn = document.getElementById('pubMessageBtn');
-        msgBtn.onclick = () => {
-          closeAllPages();
-          startDirectChat(userId, name, photo);
-        };
-
-        const pubAdsContainer = document.getElementById('publisherAdsContainer');
-        const userAds = allAds.filter(a => a.userId === userId);
-
-        if (userAds.length === 0) {
-          pubAdsContainer.innerHTML = `<div class="empty">لا توجد إعلانات منشورة لهذا المستخدم حالياً.</div>`;
-        } else {
-          let pubHtml = '';
-          userAds.forEach(a => {
-            pubHtml += `
-              <div class="ad-card" onclick="openAdPage('${a.id}')">
-                <div class="ad-top">
-                  <div class="ad-head">
-                    <span class="ad-title">${a.title}</span>
-                    <span class="badge">${a.goal === 'job_seeker' ? 'باحث عن عمل' : 'طلب توظيف'}</span>
-                  </div>
-                  <div class="ad-meta">
-                    <span>الموقع: ${a.country} - ${a.city}</span>
-                    <span>التخصص: ${a.category}</span>
-                  </div>
-                  <p class="ad-desc-preview">${a.description}</p>
-                </div>
-              </div>`;
-          });
-          pubAdsContainer.innerHTML = pubHtml;
-        }
-
-        openPage('viewPublisherPage');
-      };
-
-      window.openAdPage = (adId) => {
-        const ad = allAds.find(a => a.id === adId);
-        if (!ad) return;
-        currentOpenedAdId = adId;
-
-        const likedUsers = ad.likedUsers || [];
-        const dislikedUsers = ad.dislikedUsers || [];
-        const uid = currentUser ? currentUser.uid : null;
-        const isLiked = uid && likedUsers.includes(uid);
-        const isDisliked = uid && dislikedUsers.includes(uid);
-
-        const content = document.getElementById('adDetailContent');
-        content.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-             <div class="page-title" style="border:none; padding:0; margin:0;">${ad.title}</div>
-             <button class="btn btn-outline" onclick="shareAd('${ad.id}', '${ad.title}')">${shareSvg} مشاركة</button>
-          </div>
-          <div class="info-box">
-            <p><b>الموقع:</b> ${ad.country} - ${ad.city}</p>
-            <p><b>التخصص:</b> ${ad.category}</p>
-            <p><b>الناشر:</b> <b class="publisher-link" onclick="viewPublisherProfile('${ad.userId}', '${ad.userName}', '${ad.userPhoto}')">${ad.userName}</b></p>
-            <p><b>النوع:</b> ${ad.goal === 'job_seeker' ? 'باحث عن عمل' : 'طلب توظيف'}</p>
-            ${ad.phone ? `<p><b>رقم الاتصال:</b> <a href="tel:${ad.phone}" style="color:#38bdf8; text-decoration:underline;">${ad.phone}</a></p>` : ''}
-          </div>
-          <div class="info-box" style="white-space: pre-line;">${ad.description}</div>
-          
-          ${ad.attachmentUrl ? `
-            <div class="info-box">
-               <h4>المرفقات والملفات:</h4>
-               <a href="${ad.attachmentUrl}" target="_blank" class="btn btn-outline" style="margin-top:5px;">عرض الملف أو الصورة المرفقة</a>
-               ${ad.attachmentUrl.match(/\.(jpeg|jpg|gif|png)$/i) ? `<img src="${ad.attachmentUrl}" style="width:100%; max-height:350px; object-fit:contain; margin-top:12px; border-radius:10px;" alt="مرفق">` : ''}
-            </div>` : ''}
-
-          <div style="display:flex; gap:12px;">
-             <button class="btn" style="flex:1;" onclick="startDirectChat('${ad.userId}', '${ad.userName}', '${ad.userPhoto}')">مراسلة فورية</button>
-             ${ad.phone ? `<a href="tel:${ad.phone}" class="btn btn-success" style="flex:1; text-align:center;">اتصال هاتفي</a>` : ''}
-          </div>
-
-          <div style="display:flex; gap:12px;">
-             <button class="btn ${isLiked ? 'btn-danger' : 'btn-outline'}" style="flex:1;" onclick="handleReaction('${ad.id}', 'like')">${likeSvg} إعجاب (${likedUsers.length})</button>
-             <button class="btn ${isDisliked ? 'btn-danger' : 'btn-outline'}" style="flex:1;" onclick="handleReaction('${ad.id}', 'dislike')">${dislikeSvg} عدم إعجاب (${dislikedUsers.length})</button>
-          </div>
-
-          <div class="comments-section">
-             <h4 style="color:#f9fafb; font-size:1.2rem;">التعليقات والاستفسارات:</h4>
-             <div id="adCommentsList" style="display:flex; flex-direction:column; gap:10px; max-height:250px; overflow-y:auto;">
-                <div style="color:#9ca3af; text-align:center; padding:10px;">جاري تحميل التعليقات...</div>
-             </div>
-             <div style="display:flex; gap:10px; margin-top:5px;">
-                <input type="text" id="commentInput" placeholder="اكتب تعليقاً أو استفساراً..." style="flex:1;">
-                <button class="btn" onclick="postComment('${ad.id}')">إرسال</button>
-             </div>
-          </div>
-
-          <button class="btn btn-outline" onclick="closeAllPages()">العودة للإعلانات</button>
-        `;
-        openPage('viewAdPage');
-        loadAdComments(ad.id);
-      };
-
-      window.postComment = async (adId) => {
-        if (!currentUser) { alert("يرجى التسجيل عبر جوجل أولاً لكتابة تعليق!"); return; }
-        const input = document.getElementById('commentInput');
-        const text = input.value.trim();
-        if (!text) return;
-
-        input.value = '';
-        try {
-          await addDoc(collection(db, "ads", adId, "comments"), {
-            text,
-            userId: currentUser.uid,
-            userName: currentUser.displayName || 'مستخدم',
-            userPhoto: currentUser.photoURL || '',
-            createdAt: serverTimestamp()
-          });
-        } catch (e) { alert("خطأ في إرسال التعليق: " + e.message); }
-      };
-
-      const loadAdComments = (adId) => {
-        if (unsubscribeComments) unsubscribeComments();
-        const commentsRef = collection(db, "ads", adId, "comments");
-        const q = query(commentsRef, orderBy("createdAt", "asc"));
-
-        unsubscribeComments = onSnapshot(q, (snapshot) => {
-          const container = document.getElementById('adCommentsList');
-          if (!container) return;
-
-          if (snapshot.empty) {
-            container.innerHTML = `<div style="color:#9ca3af; text-align:center; padding:10px;">لا توجد تعليقات بعد. كن أول من يعلق!</div>`;
-            return;
-          }
-
-          let html = '';
-          snapshot.forEach(docSnap => {
-            const c = docSnap.data();
-            html += `
-              <div class="comment-item">
-                <img src="${c.userPhoto || 'https://via.placeholder.com/36'}" class="comment-avatar" alt="avatar">
-                <div class="comment-content">
-                  <span class="comment-author">${c.userName}</span>
-                  <span class="comment-text">${c.text}</span>
-                </div>
-              </div>`;
-          });
-          container.innerHTML = html;
-          container.scrollTop = container.scrollHeight;
-        });
-      };
-
-      window.startDirectChat = async (partnerId, partnerName, partnerPhoto) => {
-        if (!currentUser) { alert("يرجى التسجيل عبر جوجل أولاً للمراسلة!"); return; }
-        if (currentUser.uid === partnerId) { alert("لا يمكنك مراسلة نفسك!"); return; }
-
-        const chatId = [currentUser.uid, partnerId].sort().join('_');
-        currentActiveChatId = chatId;
-
-        document.getElementById('chatPartnerName').innerText = `محادثة مع: ${partnerName || 'مستخدم'}`;
-        openPage('chatPage');
-
-        await setDoc(doc(db, "conversations", chatId), {
-          participants: [currentUser.uid, partnerId],
-          usersData: {
-            [currentUser.uid]: { name: currentUser.displayName || 'مستخدم', photo: currentUser.photoURL || '' },
-            [partnerId]: { name: partnerName || 'مستخدم', photo: partnerPhoto || '' }
-          },
-          lastUpdated: serverTimestamp()
-        }, { merge: true });
-
-        loadChatMessages(chatId);
-      };
-
-      const loadChatMessages = (chatId) => {
-        if (unsubscribeMessages) unsubscribeMessages();
-
-        const messagesRef = collection(db, "conversations", chatId, "messages");
-        const q = query(messagesRef, orderBy("createdAt", "asc"));
-
-        unsubscribeMessages = onSnapshot(q, (snapshot) => {
-          const container = document.getElementById('chatMessagesContainer');
-          let html = '';
-          snapshot.forEach(docSnap => {
-            const msg = docSnap.data();
-            const isMe = msg.senderId === currentUser.uid;
-            html += `<div class="message-bubble ${isMe ? 'sent' : 'received'}">${msg.text}</div>`;
-          });
-          container.innerHTML = html;
-          container.scrollTop = container.scrollHeight;
-        });
-      };
-
-      document.getElementById('btnSendChatMessage').addEventListener('click', async () => {
-        const input = document.getElementById('chatMessageInput');
-        const text = input.value.trim();
-        if (!text || !currentActiveChatId || !currentUser) return;
-
-        input.value = '';
-        try {
-          await addDoc(collection(db, "conversations", currentActiveChatId, "messages"), {
-            text,
-            senderId: currentUser.uid,
-            createdAt: serverTimestamp()
-          });
-
-          await updateDoc(doc(db, "conversations", currentActiveChatId), {
-            lastUpdated: serverTimestamp(),
-            lastMessage: text
-          });
-        } catch (e) { console.error(e); }
-      });
-
-      document.getElementById('chatMessageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') document.getElementById('btnSendChatMessage').click();
-      });
-
-      window.openConversationsPage = async () => {
-        if (!currentUser) { alert("يرجى التسجيل عبر جوجل أولاً لعرض رسائلك!"); return; }
-        
-        const container = document.getElementById('conversationsListContainer');
-        container.innerHTML = `<div class="empty" style="padding: 20px;">جاري تحميل المحادثات...</div>`;
-        openPage('conversationsPage');
-
-        try {
-          const q = query(collection(db, "conversations"), where("participants", "array-contains", currentUser.uid));
-          const snapshot = await getDocs(q);
-
-          if (snapshot.empty) {
-            container.innerHTML = `<div class="empty" style="padding: 20px;">لا توجد محادثات سابقة.</div>`;
-            return;
-          }
-
-          let html = '';
-          snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            const chatId = docSnap.id;
+        function initCountriesAndFilters() {
+            const filterCountry = document.getElementById("filterCountry");
+            const countrySelect = document.getElementById("countrySelect");
             
-            const otherUid = data.participants.find(id => id !== currentUser.uid);
-            const otherUser = data.usersData && data.usersData[otherUid] ? data.usersData[otherUid] : { name: 'مستخدم', photo: '' };
+            for (let code in countriesData) {
+                let opt1 = document.createElement("option");
+                opt1.value = code;
+                opt1.text = countriesData[code].name;
+                filterCountry.appendChild(opt1);
 
-            html += `
-              <div class="conv-item" onclick="startDirectChat('${otherUid}', '${otherUser.name}', '${otherUser.photo}')">
-                <img src="${otherUser.photo || 'https://via.placeholder.com/50'}" alt="user">
-                <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
-                  <span style="color:#f9fafb; font-weight:600; font-size:1.1rem;">${otherUser.name}</span>
-                  <span style="color:#9ca3af; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:300px;">${data.lastMessage || 'ابدأ المحادثة'}</span>
-                </div>
-              </div>`;
-          });
-          container.innerHTML = html;
-        } catch (e) {
-          container.innerHTML = `<div class="empty" style="padding: 20px;">خطأ في تحميل المحادثات.</div>`;
-        }
-      };
-
-      window.quickFilter = (code) => { document.getElementById('filterCountry').value = code; filterAds(); };
-      window.quickCategory = (cat) => { document.getElementById('filterCategory').value = cat; filterAds(); };
-
-      const filterAds = () => {
-        const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
-        const countryVal = document.getElementById('filterCountry').value;
-        const cityVal = document.getElementById('filterCity').value;
-        const categoryVal = document.getElementById('filterCategory').value;
-
-        const filtered = allAds.filter(a => {
-          const matchText = !searchText || 
-            (a.title && a.title.toLowerCase().includes(searchText)) || 
-            (a.description && a.description.toLowerCase().includes(searchText));
-          
-          const matchCountry = !countryVal || a.countryCode === countryVal;
-          const matchCity = !cityVal || a.city === cityVal;
-          const matchCategory = !categoryVal || a.categoryKey === categoryVal;
-
-          return matchText && matchCountry && matchCity && matchCategory;
-        });
-
-        renderAds(filtered);
-      };
-
-      document.getElementById('searchInput').addEventListener('input', filterAds);
-      document.getElementById('btnSearch').addEventListener('click', filterAds);
-      document.getElementById('filterCountry').addEventListener('change', filterAds);
-      document.getElementById('filterCity').addEventListener('change', filterAds);
-      document.getElementById('filterCategory').addEventListener('change', filterAds);
-
-      document.getElementById('btnPostAd').addEventListener('click', () => {
-        if (currentUser) { nextStep(1); openPage('adPage'); }
-        else { alert("يرجى التسجيل عبر جوجل أولاً لنشر إعلان!"); }
-      });
-
-      document.getElementById('btnSubmitAd').addEventListener('click', async () => {
-        const title = document.getElementById('adTitle').value.trim();
-        const categoryKey = document.getElementById('adCategory').value;
-        const category = document.getElementById('adCategory').options[document.getElementById('adCategory').selectedIndex].text;
-        const countryCode = document.getElementById('countrySelect').value;
-        const country = document.getElementById('countrySelect').options[document.getElementById('countrySelect').selectedIndex].text;
-        const city = document.getElementById('citySelect').value;
-        const phone = document.getElementById('adPhone').value.trim();
-        const description = document.getElementById('adDescription').value.trim();
-        const fileInput = document.getElementById('adAttachmentInput');
-
-        if (!title || !categoryKey || !countryCode || !city || !description) {
-          alert("الرجاء إكمال كافة الحقول الأساسية!"); return;
-        }
-
-        const btn = document.getElementById('btnSubmitAd');
-        const loadingText = document.getElementById('attachmentLoading');
-        btn.disabled = true; 
-
-        let attachmentUrl = "";
-
-        if (fileInput.files.length > 0) {
-          loadingText.style.display = 'block';
-          btn.innerText = "جاري رفع الملف...";
-          const formData = new FormData();
-          formData.append("image", fileInput.files[0]);
-
-          try {
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-            const result = await res.json();
-            if (result && result.success) {
-              attachmentUrl = result.data.url;
+                let opt2 = document.createElement("option");
+                opt2.value = code;
+                opt2.text = countriesData[code].name;
+                countrySelect.appendChild(opt2);
             }
-          } catch (e) {
-            console.error("فشل رفع الملف:", e);
-          }
-          loadingText.style.display = 'none';
         }
 
-        btn.innerText = "جاري النشر...";
+        function updateCityFilterDropdown(countryCode) {
+            const cityDropdown = document.getElementById("filterCity");
+            cityDropdown.innerHTML = '<option value="">جميع المدن...</option>';
+            if (!countryCode || !countriesData[countryCode]) {
+                cityDropdown.disabled = true;
+                activeFilterCountry = "";
+                activeFilterCity = "";
+                return;
+            }
+            activeFilterCountry = countryCode;
+            cityDropdown.disabled = false;
+            countriesData[countryCode].cities.forEach(city => {
+                let opt = document.createElement("option");
+                opt.value = city;
+                opt.text = city;
+                cityDropdown.appendChild(opt);
+            });
+        }
 
-        try {
-          await addDoc(collection(db, "ads"), {
-            title, categoryKey, category, countryCode, country, city, phone, description,
-            attachmentUrl,
-            goal: selectedGoal, 
-            userId: currentUser.uid, 
-            userName: currentUser.displayName || currentUser.email,
-            userPhoto: currentUser.photoURL || '',
-            likedUsers: [], 
-            dislikedUsers: [], 
-            createdAt: Date.now()
-          });
+        function updateAdCityDropdown(countryCode) {
+            const citySelect = document.getElementById("citySelect");
+            citySelect.innerHTML = '<option value="">اختر المدينة...</option>';
+            if (!countryCode || !countriesData[countryCode]) {
+                citySelect.disabled = true;
+                return;
+            }
+            citySelect.disabled = false;
+            newAdData.country = countryCode;
+            countriesData[countryCode].cities.forEach(city => {
+                let opt = document.createElement("option");
+                opt.value = city;
+                opt.text = city;
+                citySelect.appendChild(opt);
+            });
+        }
 
-          document.getElementById('adTitle').value = '';
-          document.getElementById('adPhone').value = '';
-          document.getElementById('adDescription').value = '';
-          fileInput.value = '';
-          closeAllPages();
-          alert("تم نشر إعلانك بنجاح!");
-        } catch (e) { alert("خطأ في النشر: " + e.message); }
-        finally { btn.disabled = false; btn.innerText = "نشر الإعلان الآن"; }
-      });
+        function quickFilter(countryCode) {
+            activeFilterCountry = countryCode;
+            document.getElementById("filterCountry").value = countryCode;
+            updateCityFilterDropdown(countryCode);
+            renderAds();
+        }
 
-      listenToAds();
+        function quickCategory(cat) {
+            activeFilterCategory = cat;
+            document.getElementById("filterCategory").value = cat;
+            renderAds();
+        }
+
+        function applySearchAndFilter() {
+            activeSearchQuery = document.getElementById("searchInput").value.trim().toLowerCase();
+            activeFilterCountry = document.getElementById("filterCountry").value;
+            activeFilterCity = document.getElementById("filterCity").value;
+            activeFilterCategory = document.getElementById("filterCategory").value;
+            renderAds();
+        }
+
+        function renderAds() {
+            const container = document.getElementById("adsListContainer");
+            let filtered = adsList.filter(ad => {
+                let matchQuery = !activeSearchQuery || ad.title.toLowerCase().includes(activeSearchQuery) || ad.description.toLowerCase().includes(activeSearchQuery);
+                let matchCountry = !activeFilterCountry || ad.country === activeFilterCountry;
+                let matchCity = !activeFilterCity || ad.city === activeFilterCity;
+                let matchCat = !activeFilterCategory || ad.category === activeFilterCategory;
+                return matchQuery && matchCountry && matchCity && matchCat;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty">لا توجد إعلانات مطابقة لبحثك الحالي.</div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            filtered.forEach(ad => {
+                const badgeText = ad.goal === 'job_seeker' ? 'باحث عن عمل' : 'طالب موظف';
+                const countryName = countriesData[ad.country] ? countriesData[ad.country].name : ad.country;
+                
+                let card = document.createElement("div");
+                card.className = "ad-card";
+                card.onclick = () => viewAdDetails(ad.id);
+
+                card.innerHTML = `
+                    <div class="ad-top">
+                        <div class="ad-head">
+                            <div class="ad-title">${escapeHtml(ad.title)}</div>
+                            <span class="badge">${badgeText}</span>
+                        </div>
+                        <div class="ad-meta">
+                            <span>📍 ${countryName} - ${ad.city}</span>
+                            <span>👤 <span class="publisher-link" onclick="event.stopPropagation(); viewPublisherProfile('${ad.userId}')">${escapeHtml(ad.userName)}</span></span>
+                            <span>📅 ${ad.date}</span>
+                        </div>
+                        <div class="ad-desc-preview">${escapeHtml(ad.description)}</div>
+                        ${ad.attachment && isImageFile(ad.attachment) ? `<img src="${ad.attachment}" class="ad-card-img">` : ''}
+                    </div>
+                    <div class="ad-footer" onclick="event.stopPropagation()">
+                        <div class="like-actions">
+                            <button class="action-btn ${currentUser && ad.likesUsers.includes(currentUser.id) ? 'active-like' : ''}" onclick="toggleLike('${ad.id}')">
+                                <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                                <span>${ad.likes}</span>
+                            </button>
+                            <button class="action-btn ${currentUser && ad.dislikesUsers.includes(currentUser.id) ? 'active-dislike' : ''}" onclick="toggleDislike('${ad.id}')">
+                                <svg viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>
+                                <span>${ad.dislikes}</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-outline" style="padding: 6px 12px; font-size:0.85rem;" onclick="shareAd('${ad.title}')">مشاركة 🔗</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function isImageFile(url) {
+            return url.startsWith("data:image/") || url.match(/\.(jpeg|jpg|gif|png)$/i);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // تفاصيل الإعلان والتعليقات
+        function viewAdDetails(adId) {
+            let ad = adsList.find(a => a.id === adId);
+            if (!ad) return;
+
+            const container = document.getElementById("adDetailContent");
+            const countryName = countriesData[ad.country] ? countriesData[ad.country].name : ad.country;
+
+            container.innerHTML = `
+                <div class="page-title">${escapeHtml(ad.title)}</div>
+                <div class="info-box">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span><b>الناشر:</b> <span class="publisher-link" onclick="closePage('viewAdPage'); viewPublisherProfile('${ad.userId}')">${escapeHtml(ad.userName)}</span></span>
+                        <span><b>التاريخ:</b> ${ad.date}</span>
+                    </div>
+                    <p><b>الموقع:</b> ${countryName} - ${ad.city}</p>
+                    <p><b>التصنيف:</b> ${ad.category}</p>
+                    ${ad.phone ? `<p><b>رقم التواصل:</b> <a href="tel:${ad.phone}" style="color:#38bdf8">${ad.phone}</a></p>` : ''}
+                    <hr style="border-color:#374151; margin:15px 0;">
+                    <p style="white-space: pre-wrap;">${escapeHtml(ad.description)}</p>
+                    ${ad.attachment ? `<div style="margin-top:15px;"><a href="${ad.attachment}" target="_blank" class="btn btn-outline">عرض المرفق أو تحميله</a></div>` : ''}
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" onclick="startChatWithPublisher('${ad.userId}', '${escapeHtml(ad.userName)}')">مراسلة صاحب الإعلان 💬</button>
+                </div>
+
+                <div class="comments-section">
+                    <h4 style="color:#f9fafb;">التعليقات والمناقشات (${ad.comments.length})</h4>
+                    <div id="commentsListContainer" style="display:flex; flex-direction:column; gap:10px;">
+                        ${ad.comments.length === 0 ? '<div style="color:#9ca3af; font-size:0.95rem;">لا توجد تعليقات بعد. كن أول المتحدثين!</div>' : 
+                          ad.comments.map(c => `
+                            <div class="comment-item">
+                                <img src="${c.userAvatar}" class="comment-avatar">
+                                <div class="comment-content">
+                                    <span class="comment-author">${escapeHtml(c.userName)}</span>
+                                    <span class="comment-text">${escapeHtml(c.text)}</span>
+                                </div>
+                            </div>
+                          `).join('')}
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="text" id="newCommentInput" placeholder="اكتب تعليقك هنا..." style="flex:1;">
+                        <button class="btn" onclick="postComment('${ad.id}')">إرسال</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-outline" style="margin-top:10px;" onclick="closePage('viewAdPage')">العودة للرئيسية</button>
+            `;
+            openPage('viewAdPage');
+        }
+
+        function postComment(adId) {
+            if (!currentUser) {
+                alert("الرجاء تسجيل الدخول لإضافة تعليق.");
+                simulateGoogleLogin();
+                return;
+            }
+            const input = document.getElementById("newCommentInput");
+            const text = input.value.trim();
+            if (!text) return;
+
+            let ad = adsList.find(a => a.id === adId);
+            if (ad) {
+                ad.comments.push({
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    userAvatar: currentUser.avatar,
+                    text: text
+                });
+                localStorage.setItem('mehan_ads_list', JSON.stringify(adsList));
+                viewAdDetails(adId);
+                renderAds();
+            }
+        }
+
+        function toggleLike(adId) {
+            if (!currentUser) { alert("يجب تسجيل الدخول للإعجاب."); simulateGoogleLogin(); return; }
+            let ad = adsList.find(a => a.id === adId);
+            if (!ad) return;
+
+            let likedIndex = ad.likesUsers.indexOf(currentUser.id);
+            let dislikedIndex = ad.dislikesUsers.indexOf(currentUser.id);
+
+            if (likedIndex > -1) {
+                ad.likesUsers.splice(likedIndex, 1);
+                ad.likes--;
+            } else {
+                ad.likesUsers.push(currentUser.id);
+                ad.likes++;
+                if (dislikedIndex > -1) {
+                    ad.dislikesUsers.splice(dislikedIndex, 1);
+                    ad.dislikes--;
+                }
+            }
+            localStorage.setItem('mehan_ads_list', JSON.stringify(adsList));
+            renderAds();
+        }
+
+        function toggleDislike(adId) {
+            if (!currentUser) { alert("يجب تسجيل الدخول."); simulateGoogleLogin(); return; }
+            let ad = adsList.find(a => a.id === adId);
+            if (!ad) return;
+
+            let likedIndex = ad.likesUsers.indexOf(currentUser.id);
+            let dislikedIndex = ad.dislikesUsers.indexOf(currentUser.id);
+
+            if (dislikedIndex > -1) {
+                ad.dislikesUsers.splice(dislikedIndex, 1);
+                ad.dislikes--;
+            } else {
+                ad.dislikesUsers.push(currentUser.id);
+                ad.dislikes++;
+                if (likedIndex > -1) {
+                    ad.likesUsers.splice(likedIndex, 1);
+                    ad.likes--;
+                }
+            }
+            localStorage.setItem('mehan_ads_list', JSON.stringify(adsList));
+            renderAds();
+        }
+
+        function shareAd(title) {
+            if (navigator.share) {
+                navigator.share({ title: 'مهن عرب', text: title, url: window.location.href }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("تم نسخ رابط المنصة إلى الحافظة!");
+            }
+        }
+
+        // ملف الناشر الشخصي
+        function viewPublisherProfile(userId) {
+            let pubAds = adsList.filter(a => a.userId === userId);
+            let pubName = pubAds.length > 0 ? pubAds[0].userName : "مستخدم مهن عرب";
+            let pubAvatar = pubAds.length > 0 ? pubAds[0].userAvatar : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+
+            document.getElementById("pubAvatar").src = pubAvatar;
+            document.getElementById("pubName").innerText = pubName;
+            document.getElementById("pubVerified").style.display = "inline-block";
+            
+            document.getElementById("pubMessageBtn").onclick = () => {
+                closePage('viewPublisherPage');
+                startChatWithPublisher(userId, pubName);
+            };
+
+            const container = document.getElementById("publisherAdsContainer");
+            container.innerHTML = "";
+            if (pubAds.length === 0) {
+                container.innerHTML = `<div class="empty">لا توجد إعلانات نشطة لهذا المستخدم.</div>`;
+            } else {
+                pubAds.forEach(ad => {
+                    let item = document.createElement("div");
+                    item.className = "ad-card";
+                    item.style.padding = "15px";
+                    item.onclick = () => { closePage('viewPublisherPage'); viewAdDetails(ad.id); };
+                    item.innerHTML = `<div class="ad-title" style="font-size:1.1rem;">${escapeHtml(ad.title)}</div><div class="ad-meta"><span>📅 ${ad.date}</span></div>`;
+                    container.appendChild(item);
+                });
+            }
+            openPage('viewPublisherPage');
+        }
+
+        // نظام المحادثات والرسائل الفورية
+        function startChatWithPublisher(targetUserId, targetUserName) {
+            if (!currentUser) {
+                alert("يجب تسجيل الدخول لبدء مراسلة المستخدمين.");
+                simulateGoogleLogin();
+                return;
+            }
+            if (currentUser.id === targetUserId) {
+                alert("لا يمكنك مراسلة نفسك!");
+                return;
+            }
+
+            let convId = [currentUser.id, targetUserId].sort().join("_");
+            let conv = conversations.find(c => c.id === convId);
+            if (!conv) {
+                conv = { id: convId, participants: [currentUser.id, targetUserId], partnerName: targetUserName, messages: [] };
+                conversations.push(conv);
+                localStorage.setItem('mehan_conversations', JSON.stringify(conversations));
+            }
+            openChatRoom(convId);
+        }
+
+        function openConversationsPage() {
+            if (!currentUser) {
+                alert("يجب تسجيل الدخول لعرض الرسائل.");
+                simulateGoogleLogin();
+                return;
+            }
+            openPage('conversationsPage');
+        }
+
+        function renderConversationsList() {
+            const container = document.getElementById("conversationsListContainer");
+            let userConvs = conversations.filter(c => c.participants.includes(currentUser.id));
+            
+            if (userConvs.length === 0) {
+                container.innerHTML = `<div class="empty" style="padding:20px;">لا توجد محادثات سابقة. ابدأ بالتواصل مع أصحاب الإعلانات!</div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            userConvs.forEach(conv => {
+                let lastMsg = conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].text : "بدء المحادثة...";
+                let item = document.createElement("div");
+                item.className = "conv-item";
+                item.onclick = () => { closePage('conversationsPage'); openChatRoom(conv.id); };
+                item.innerHTML = `
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80">
+                    <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+                        <span style="font-weight:600; color:#f9fafb;">${escapeHtml(conv.partnerName || 'مستخدم')}</span>
+                        <span style="font-size:0.9rem; color:#9ca3af; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(lastMsg)}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        let activeChatId = null;
+        function openChatRoom(convId) {
+            activeChatId = convId;
+            let conv = conversations.find(c => c.id === convId);
+            if (!conv) return;
+
+            document.getElementById("chatPartnerName").innerText = conv.partnerName || "محادثة خاصة";
+            renderChatMessages(conv);
+            openPage('chatPage');
+        }
+
+        function renderChatMessages(conv) {
+            const container = document.getElementById("chatMessagesContainer");
+            container.innerHTML = "";
+            if (conv.messages.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#6b7280; margin-top:20px;">أرسل رسالتك الأولى لبدء المحادثة...</div>`;
+                return;
+            }
+            conv.messages.forEach(msg => {
+                let bubble = document.createElement("div");
+                bubble.className = `message-bubble ${msg.senderId === currentUser.id ? 'sent' : 'received'}`;
+                bubble.innerText = msg.text;
+                container.appendChild(bubble);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById("chatMessageInput");
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            let conv = conversations.find(c => c.id === activeChatId);
+            if (conv) {
+                conv.messages.push({ senderId: currentUser.id, text: text, time: Date.now() });
+                localStorage.setItem('mehan_conversations', JSON.stringify(conversations));
+                input.value = "";
+                renderChatMessages(conv);
+            }
+        }
+
+        // خطوات نشر الإعلان
+        function nextStep(stepNum) {
+            if (stepNum === 2) {
+                if (!newAdData.country || !newAdData.city) {
+                    alert("الرجاء اختيار الدولة والمدينة أولاً.");
+                    return;
+                }
+            }
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${stepNum}`).classList.add('active');
+        }
+
+        function selectGoal(goal) {
+            newAdData.goal = goal;
+            nextStep(3);
+        }
+
+        function handleAdAttachmentUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById("attachmentLoading").style.display = "block";
+            const reader = new FileReader();
+            reader.onload = function(uploadEvent) {
+                newAdData.attachment = uploadEvent.target.result;
+                document.getElementById("attachmentLoading").style.display = "none";
+                alert("تم إرفاق الملف بنجاح!");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function submitNewAd() {
+            const title = document.getElementById("adTitle").value.trim();
+            const category = document.getElementById("adCategory").value;
+            const phone = document.getElementById("adPhone").value.trim();
+            const description = document.getElementById("adDescription").value.trim();
+
+            if (!title || !category || !description) {
+                alert("الرجاء تعبئة الحقول الأساسية: عنوان الإعلان، التخصص، وتفاصيل الإعلان.");
+                return;
+            }
+
+            let newAd = {
+                id: "ad_" + Date.now(),
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userAvatar: currentUser.avatar,
+                isVerified: currentUser.isVerified || false,
+                title: title,
+                category: category,
+                country: newAdData.country,
+                city: newAdData.city,
+                phone: phone,
+                description: description,
+                attachment: newAdData.attachment,
+                goal: newAdData.goal || 'job_seeker',
+                date: new Date().toISOString().split('T')[0],
+                likes: 0,
+                dislikes: 0,
+                likesUsers: [],
+                dislikesUsers: [],
+                comments: []
+            };
+
+            adsList.unshift(newAd);
+            localStorage.setItem('mehan_ads_list', JSON.stringify(adsList));
+            alert("تم نشر إعلانك بنجاح!");
+            closePage('adPage');
+            renderAds();
+        }
+
+        // قِسم قص الصور (Image Cropping) وتحديث الملف الشخصي
+        function handleImageUploadForCrop(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                cropImageObj = new Image();
+                cropImageObj.onload = function() {
+                    cropOffsetX = 0;
+                    cropOffsetY = 0;
+                    document.getElementById("cropContainer").style.display = "flex";
+                    drawCropCanvas();
+                };
+                cropImageObj.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function drawCropCanvas() {
+            const canvas = document.getElementById("imageCanvas");
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!cropImageObj) return;
+
+            let scale = Math.max(canvas.width / cropImageObj.width, canvas.height / cropImageObj.height);
+            let w = cropImageObj.width * scale;
+            let h = cropImageObj.height * scale;
+            let x = (canvas.width - w) / 2 + cropOffsetX;
+            let y = (canvas.height - h) / 2 + cropOffsetY;
+
+            ctx.drawImage(cropImageObj, x, y, w, h);
+        }
+
+        function setupCanvasDrag() {
+            const canvas = document.getElementById("imageCanvas");
+            
+            canvas.addEventListener("mousedown", (e) => {
+                isDragging = true;
+                startX = e.clientX - cropOffsetX;
+                startY = e.clientY - cropOffsetY;
+            });
+            window.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                cropOffsetX = e.clientX - startX;
+                cropOffsetY = e.clientY - startY;
+                drawCropCanvas();
+            });
+            window.addEventListener("mouseup", () => { isDragging = false; });
+
+            // دعم اللمس للجوال
+            canvas.addEventListener("touchstart", (e) => {
+                isDragging = true;
+                startX = e.touches[0].clientX - cropOffsetX;
+                startY = e.touches[0].clientY - cropOffsetY;
+            });
+            window.addEventListener("touchmove", (e) => {
+                if (!isDragging) return;
+                cropOffsetX = e.touches[0].clientX - startX;
+                cropOffsetY = e.touches[0].clientY - startY;
+                drawCropCanvas();
+            });
+            window.addEventListener("touchend", () => { isDragging = false; });
+        }
+
+        function confirmCropImage() {
+            const canvas = document.getElementById("imageCanvas");
+            const croppedDataUrl = canvas.toDataURL("image/png");
+            currentUser.avatar = croppedDataUrl;
+            document.getElementById("editProfilePreview").src = croppedDataUrl;
+            document.getElementById("cropContainer").style.display = "none";
+            alert("تم اعتماد الصورة الشخصية بنجاح!");
+        }
+
+        function saveProfileChanges() {
+            const newName = document.getElementById("editUserName").value.trim();
+            if (!newName) {
+                alert("الاسم لا يمكن أن يكون فارغاً.");
+                return;
+            }
+            currentUser.name = newName;
+            localStorage.setItem('mehan_current_user', JSON.stringify(currentUser));
+            
+            // تحديث اسم المستخدم في الإعلانات السابقة
+            adsList.forEach(ad => {
+                if (ad.userId === currentUser.id) {
+                    ad.userName = currentUser.name;
+                    ad.userAvatar = currentUser.avatar;
+                }
+            });
+            localStorage.setItem('mehan_ads_list', JSON.stringify(adsList));
+
+            updateAuthUI();
+            alert("تم حفظ التعديلات بنجاح!");
+            closePage('profilePage');
+            renderAds();
+        }
     </script>
 </body>
 </html>
